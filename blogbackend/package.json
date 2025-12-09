@@ -1,0 +1,16 @@
+{
+  "name": "blogbackend",
+  "version": "1.0.0",
+  "description": "Blog backend practice",
+  "license": "ISC",
+  "author": "Alex Thanas",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "mongoose": "^9.0.1"
+  }
+}

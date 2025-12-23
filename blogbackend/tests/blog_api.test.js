@@ -45,7 +45,7 @@ describe('Post tests', () => {
   test('Post request to blogs', async () => {
     const newBlog = {
       title: 'This is a test title',
-      content: 'This is test content lorem Ipsum dabelamd adwadwd a  ',
+      author: 'Naomi Nagata',
       url: 'www.dadadadwdwd.wadarwwad',
       like: 155,
     }
@@ -60,15 +60,15 @@ describe('Post tests', () => {
 
     assert.strictEqual(blogsAtEnd.length, helper.initialBlog.length + 1)
 
-    const contents = blogsAtEnd.map(b => b.title)
-    assert(contents.includes('This is a test title'))
+    const title = blogsAtEnd.map(b => b.title)
+    assert(title.includes('This is a test title'))
 
   })
 
   test('Post without likes', async () => {
     const newBlog = {
       title: 'This is a test title',
-      content: 'This is test content lorem Ipsum dabelamd adwadwd a  ',
+      author: 'This is test content lorem Ipsum dabelamd adwadwd a  ',
       url: 'www.dadadadwdwd.wadarwwad',
     }
 
@@ -84,12 +84,60 @@ describe('Post tests', () => {
 
   test('Post without title responds with 400', async () => {
     const newBlog = {
-      content: 'This is test content lorem Ipsum dabelamd adwadwd a  ',
+      author: 'This is test Author',
       url: 'www.dadadadwdwd.wadarwwad',
       like: 15
     }
 
     await api.post('/api/blogs').send(newBlog).expect(400)
+  })
+})
+
+
+describe('updating notes', () => {
+  test('Updating a notes like amount', async () => {
+    const blogAtStart = await helper.blogsInDb()
+
+    const blogToUpdate = blogAtStart[0]
+
+    const updatedBlog = {
+      title: blogAtStart[0].title,
+      author: blogAtStart[0].author,
+      url: blogAtStart[0].url,
+      like: 2000
+    }
+
+    await api.put(`/api/blogs/${blogToUpdate.id}`)
+      .send(updatedBlog)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+
+
+    const blogAtEnd = await helper.blogsInDb()
+    console.log(blogAtEnd.length)
+
+    assert.strictEqual(blogAtEnd.length, helper.initialBlog.length)
+    // grabs blog to check 
+    const updated = blogAtEnd.find(b => b.id === blogToUpdate.id)
+    // checks if blog has updated
+    assert.strictEqual(updated.like, 2000)
+  })
+})
+
+
+describe('deletion of a blog', () => {
+  test('succeeds with status code 204', async () => {
+    const blogAtStart = await helper.blogsInDb()
+    const blogToDelete = blogAtStart[0]
+
+    await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204)
+
+    const blogAtEnd = await helper.blogsInDb()
+
+    const title = blogAtEnd.map(b => b.title)
+    assert(!title.includes(blogToDelete.title))
+
+    assert.strictEqual(blogAtEnd.length, helper.initialBlog.length -1)
   })
 })
 
